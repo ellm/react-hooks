@@ -14,22 +14,7 @@ import {
 } from '../pokemon'
 
 function PokemonInfo({pokemonName}) {
-  // 🐨 Have state for the pokemon (null)
-  // 🐨 use React.useEffect where the callback should be called whenever the
-  // pokemon name changes.
-  // 💰 DON'T FORGET THE DEPENDENCIES ARRAY!
-  // 💰 if the pokemonName is falsy (an empty string) then don't bother making the request (exit early).
-  // 🐨 before calling `fetchPokemon`, clear the current pokemon state by setting it to null
-  // 💰 Use the `fetchPokemon` function to fetch a pokemon by its name:
-  //   fetchPokemon('Pikachu').then(
-  //     pokemonData => { /* update all the state here */},
-  //   )
-  // 🐨 return the following things based on the `pokemon` state and `pokemonName` prop:
-  //   1. no pokemonName: 'Submit a pokemon'
-  //   2. pokemonName but no pokemon: <PokemonInfoFallback name={pokemonName} />
-  //   3. pokemon: <PokemonDataView pokemon={pokemon} />
-  const [status, setStatus] = React.useState('idle');
-  const [pokemon, setPokemon] = React.useState(null);
+  const [status, setStatus] = React.useState({status: 'idle', pokemon: null});
   const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
@@ -37,34 +22,32 @@ function PokemonInfo({pokemonName}) {
       return;
     }
 
-    setPokemon(null);
-    setStatus('pending');
+    setStatus({status: 'pending', pokemon: null});
 
     fetchPokemon(pokemonName)
       .then(
         pokemonData => {
-          setPokemon(pokemonData);
-          setStatus('resolved');
+          setStatus({status: 'pending', pokemon: pokemonData});
         }
       )
       .catch(
         error => {
           setError(error)
-          setStatus('rejected');
+          setStatus({status: 'rejected', pokemon: null});
         }
       );
 
   }, [pokemonName]);
 
-  if ('idle' === status) {
+  if ('idle' === status.status) {
     return 'Submit a pokemon';
   }
 
-  if ('pending' === status) {
+  if ('pending' === status.status) {
     return <PokemonInfoFallback name={pokemonName} />;
   }
 
-  if ('rejected' === status) {
+  if ('rejected' === status.status) {
     return (
       <div role="alert">
         There was an error: <pre style={{ whiteSpace: 'normal' }}>{error.message}</pre>
@@ -72,8 +55,8 @@ function PokemonInfo({pokemonName}) {
     );
   }
 
-  if ('resolved' === status) {
-    return <PokemonDataView pokemon={pokemon} />;
+  if ('resolved' === status.status) {
+    return <PokemonDataView pokemon={status.pokemon} />;
   }
 }
 
