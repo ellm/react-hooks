@@ -42,7 +42,7 @@ function PokemonInfo({pokemonName}) {
     fetchPokemon(pokemonName)
       .then(
         pokemonData => {
-          setState({ status: 'pending', pokemonData});
+          setState({ status: 'resolved', pokemon: pokemonData});
         },
         error => {
           setState({ status: 'rejected', error })
